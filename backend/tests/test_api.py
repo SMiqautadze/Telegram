@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 
 # Get the backend URL from environment variable or use default
-BACKEND_URL = os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001')
+BACKEND_URL = os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001/api')
 
 class TestTelegramScraperAPI:
     def setup_method(self):
