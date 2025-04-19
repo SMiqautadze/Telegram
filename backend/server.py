@@ -637,7 +637,7 @@ async def scrape_channel_task(user_id, channel_id, offset_id, scrape_media):
     finally:
         await client.disconnect()
 
-@app.get("/channel-data/{channel_id}")
+@prefix_router.get("/channel-data/{channel_id}")
 async def get_channel_data(channel_id: str, current_user: User = Depends(get_current_user)):
     if channel_id not in current_user.channels:
         raise HTTPException(
