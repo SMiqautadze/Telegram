@@ -375,7 +375,7 @@ async def set_telegram_credentials(credentials: TelegramCredentials, current_use
     
     return {"message": "Telegram credentials set successfully"}
 
-@app.get("/telegram-credentials")
+@prefix_router.get("/telegram-credentials")
 async def get_telegram_credentials(current_user: User = Depends(get_current_user)):
     if not current_user.telegram_credentials:
         raise HTTPException(
