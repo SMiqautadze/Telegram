@@ -777,7 +777,7 @@ async def continuous_scraping_task(user_id):
         # Wait before checking again
         await asyncio.sleep(60)
 
-@app.get("/channels-list")
+@api_router.get("/channels-list")
 async def list_channels(current_user: User = Depends(get_current_user)):
     client = await get_telegram_client(current_user.id)
     if not client:
