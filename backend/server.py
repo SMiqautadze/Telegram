@@ -720,7 +720,7 @@ async def export_data(
         conn.close()
         return {"message": "JSON export completed", "path": output_file}
 
-@app.post("/continuous-scrape/start")
+@prefix_router.post("/continuous-scrape/start")
 async def start_continuous_scrape(current_user: User = Depends(get_current_user)):
     if not current_user.telegram_credentials:
         raise HTTPException(
