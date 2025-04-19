@@ -294,7 +294,7 @@ async def google_login(data: GoogleLogin):
             detail="Invalid Google token"
         )
 
-@app.post("/reset-password")
+@prefix_router.post("/reset-password")
 async def reset_password(data: ResetPassword):
     user = await get_user(data.email)
     if not user:
