@@ -385,7 +385,7 @@ async def get_telegram_credentials(current_user: User = Depends(get_current_user
     
     return current_user.telegram_credentials
 
-@app.get("/channels")
+@prefix_router.get("/channels")
 async def get_channels(current_user: User = Depends(get_current_user)):
     return {"channels": current_user.channels}
 
