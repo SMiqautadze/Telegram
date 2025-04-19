@@ -247,7 +247,7 @@ async def login(user_data: UserLogin):
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.post("/google-login", response_model=Token)
+@api_router.post("/google-login", response_model=Token)
 async def google_login(data: GoogleLogin):
     try:
         # Verify the Google token
@@ -295,7 +295,7 @@ async def google_login(data: GoogleLogin):
             detail="Invalid Google token"
         )
 
-@app.post("/reset-password")
+@api_router.post("/reset-password")
 async def reset_password(data: ResetPassword):
     user = await get_user(data.email)
     if not user:
@@ -311,7 +311,7 @@ async def reset_password(data: ResetPassword):
     # For testing, just return the token
     return {"message": "Password reset requested", "token": reset_token}
 
-@app.post("/set-new-password")
+@api_router.post("/set-new-password")
 async def set_new_password(data: NewPassword):
     try:
         # Verify token
@@ -348,7 +348,7 @@ async def set_new_password(data: NewPassword):
             detail="Invalid or expired token"
         )
 
-@app.get("/me", response_model=UserResponse)
+@api_router.get("/me", response_model=UserResponse)
 async def read_users_me(current_user: User = Depends(get_current_user)):
     return {
         "id": current_user.id,
