@@ -216,7 +216,7 @@ async def register_user(user_data: UserCreate):
         "full_name": user_data.full_name
     }
 
-@app.post("/token", response_model=Token)
+@prefix_router.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = await authenticate_user(form_data.username, form_data.password)
     if not user:
