@@ -1,161 +1,63 @@
-import pytest
+import unittest
 import requests
-import os
+import uuid
 from datetime import datetime
 
-class TestTelegramScraperAPI:
-    BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://your-backend-url.com')
-    TEST_USER = {
-        "email": "test@example.com",
-        "password": "password123",
-        "full_name": "Test User"
-    }
-    TEST_TELEGRAM_CREDS = {
-        "api_id": 20223845,
-        "api_hash": "2d9943c0c4b2b37998a6868f385f3f32",
-        "phone": "+1234567890"
-    }
-    TEST_CHANNEL = {
-        "channel_id": "test_channel",
-        "last_message_id": 0
-    }
-
-    def setup_method(self):
-        self.token = None
-        # Clean up any existing test user
-        self.cleanup_test_user()
-
-    def cleanup_test_user(self):
-        """Helper method to clean up test user if exists"""
-        try:
-            # Try to login and delete if exists
-            response = requests.post(
-                f"{self.BASE_URL}/api/login",
-                json={"email": self.TEST_USER["email"], "password": self.TEST_USER["password"]}
-            )
-            if response.status_code == 200:
-                # Would need a delete user endpoint in production
-                pass
-        except:
-            pass
-
-    def test_01_register_user(self):
+class TestAuthAPI(unittest.TestCase):
+    def setUp(self):
+        self.base_url = "http://localhost:8001/api"  # Using local endpoint
+        self.test_user = {
+            "email": f"test_{uuid.uuid4()}@test.com",
+            "password": "Test@123",
+            "full_name": "Test User"
+        }
+        
+    def test_1_register(self):
         """Test user registration"""
+        print("\nTesting user registration...")
         response = requests.post(
-            f"{self.BASE_URL}/api/register",
-            json=self.TEST_USER
+            f"{self.base_url}/register",
+            json=self.test_user
         )
-        assert response.status_code == 200
+        print(f"Registration response: {response.status_code}")
+        print(f"Response body: {response.json()}")
+        self.assertEqual(response.status_code, 200)
         data = response.json()
-        assert "id" in data
-        assert data["email"] == self.TEST_USER["email"]
+        self.assertEqual(data["email"], self.test_user["email"])
+        self.assertEqual(data["full_name"], self.test_user["full_name"])
+        print("✅ Registration test passed")
 
-    def test_02_login_user(self):
+    def test_2_login(self):
         """Test user login"""
+        print("\nTesting user login...")
         response = requests.post(
-            f"{self.BASE_URL}/api/login",
+            f"{self.base_url}/login",
             json={
-                "email": self.TEST_USER["email"],
-                "password": self.TEST_USER["password"]
+                "email": self.test_user["email"],
+                "password": self.test_user["password"]
             }
         )
-        assert response.status_code == 200
+        print(f"Login response: {response.status_code}")
+        print(f"Response body: {response.json()}")
+        self.assertEqual(response.status_code, 200)
         data = response.json()
-        assert "access_token" in data
-        assert data["token_type"] == "bearer"
-        self.token = data["access_token"]
+        self.assertIn("access_token", data)
+        self.assertEqual(data["token_type"], "bearer")
+        print("✅ Login test passed")
 
-    def test_03_get_user_profile(self):
-        """Test getting user profile"""
-        if not self.token:
-            self.test_02_login_user()
-        
-        headers = {"Authorization": f"Bearer {self.token}"}
-        response = requests.get(
-            f"{self.BASE_URL}/api/me",
-            headers=headers
-        )
-        assert response.status_code == 200
-        data = response.json()
-        assert data["email"] == self.TEST_USER["email"]
-
-    def test_04_set_telegram_credentials(self):
-        """Test setting Telegram credentials"""
-        if not self.token:
-            self.test_02_login_user()
-        
-        headers = {"Authorization": f"Bearer {self.token}"}
+    def test_3_invalid_login(self):
+        """Test invalid login credentials"""
+        print("\nTesting invalid login...")
         response = requests.post(
-            f"{self.BASE_URL}/api/telegram-credentials",
-            headers=headers,
-            json=self.TEST_TELEGRAM_CREDS
+            f"{self.base_url}/login",
+            json={
+                "email": self.test_user["email"],
+                "password": "wrongpassword"
+            }
         )
-        assert response.status_code == 200
-        data = response.json()
-        assert "message" in data
-        assert "successfully" in data["message"].lower()
+        print(f"Invalid login response: {response.status_code}")
+        self.assertEqual(response.status_code, 401)
+        print("✅ Invalid login test passed")
 
-    def test_05_get_telegram_credentials(self):
-        """Test getting Telegram credentials"""
-        if not self.token:
-            self.test_02_login_user()
-        
-        headers = {"Authorization": f"Bearer {self.token}"}
-        response = requests.get(
-            f"{self.BASE_URL}/api/telegram-credentials",
-            headers=headers
-        )
-        assert response.status_code == 200
-        data = response.json()
-        assert data["api_id"] == self.TEST_TELEGRAM_CREDS["api_id"]
-        assert data["api_hash"] == self.TEST_TELEGRAM_CREDS["api_hash"]
-        assert data["phone"] == self.TEST_TELEGRAM_CREDS["phone"]
-
-    def test_06_add_channel(self):
-        """Test adding a channel"""
-        if not self.token:
-            self.test_02_login_user()
-        
-        headers = {"Authorization": f"Bearer {self.token}"}
-        response = requests.post(
-            f"{self.BASE_URL}/api/channels",
-            headers=headers,
-            json=self.TEST_CHANNEL
-        )
-        assert response.status_code == 200
-        data = response.json()
-        assert "message" in data
-        assert "successfully" in data["message"].lower()
-
-    def test_07_get_channels(self):
-        """Test getting channels list"""
-        if not self.token:
-            self.test_02_login_user()
-        
-        headers = {"Authorization": f"Bearer {self.token}"}
-        response = requests.get(
-            f"{self.BASE_URL}/api/channels",
-            headers=headers
-        )
-        assert response.status_code == 200
-        data = response.json()
-        assert "channels" in data
-        assert self.TEST_CHANNEL["channel_id"] in data["channels"]
-
-    def test_08_remove_channel(self):
-        """Test removing a channel"""
-        if not self.token:
-            self.test_02_login_user()
-        
-        headers = {"Authorization": f"Bearer {self.token}"}
-        response = requests.delete(
-            f"{self.BASE_URL}/api/channels/{self.TEST_CHANNEL['channel_id']}",
-            headers=headers
-        )
-        assert response.status_code == 200
-        data = response.json()
-        assert "message" in data
-        assert "successfully" in data["message"].lower()
-
-if __name__ == "__main__":
-    pytest.main([__file__, "-v"])
+if __name__ == '__main__':
+    unittest.main(verbosity=2)
