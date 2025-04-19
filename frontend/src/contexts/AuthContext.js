@@ -79,16 +79,22 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (email, password, fullName) => {
     try {
-      await axios.post(`${BACKEND_URL}/register`, {
+      console.log('Register request to:', `${BACKEND_URL}/register`, { email, password, full_name: fullName });
+      const response = await axios.post(`${BACKEND_URL}/register`, {
         email,
         password,
         full_name: fullName
       });
       
-      return login(email, password);
+      console.log('Register response:', response.data);
+      return { success: true, data: response.data };
     } catch (error) {
       console.error('Registration error:', error);
-      throw error;
+      console.error('Registration error details:', error.response?.data, error.response?.status);
+      return { 
+        success: false, 
+        message: error.response?.data?.detail || 'Registration failed. Please try again.'
+      };
     }
   };
 
