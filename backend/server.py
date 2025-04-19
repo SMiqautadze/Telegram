@@ -355,7 +355,7 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
         "full_name": current_user.full_name
     }
 
-@app.post("/telegram-credentials")
+@prefix_router.post("/telegram-credentials")
 async def set_telegram_credentials(credentials: TelegramCredentials, current_user: User = Depends(get_current_user)):
     result = await db.users.update_one(
         {"id": current_user.id},
