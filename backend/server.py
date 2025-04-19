@@ -805,7 +805,7 @@ async def list_channels(current_user: User = Depends(get_current_user)):
     finally:
         await client.disconnect()
 
-@app.on_event("shutdown")
+@prefix_router.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
 
