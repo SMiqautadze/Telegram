@@ -662,7 +662,7 @@ async def get_channel_data(channel_id: str, current_user: User = Depends(get_cur
     messages = [dict(row) for row in rows]
     return {"messages": messages}
 
-@app.get("/export-data/{channel_id}/{format}")
+@prefix_router.get("/export-data/{channel_id}/{format}")
 async def export_data(
     channel_id: str, 
     format: str,
