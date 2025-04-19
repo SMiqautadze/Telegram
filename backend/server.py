@@ -310,7 +310,7 @@ async def reset_password(data: ResetPassword):
     # For testing, just return the token
     return {"message": "Password reset requested", "token": reset_token}
 
-@app.post("/set-new-password")
+@prefix_router.post("/set-new-password")
 async def set_new_password(data: NewPassword):
     try:
         # Verify token
