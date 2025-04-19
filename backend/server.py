@@ -412,7 +412,7 @@ async def add_channel(channel: ChannelModel, current_user: User = Depends(get_cu
     
     return {"message": f"Channel {channel.channel_id} added successfully"}
 
-@app.delete("/channels/{channel_id}")
+@prefix_router.delete("/channels/{channel_id}")
 async def remove_channel(channel_id: str, current_user: User = Depends(get_current_user)):
     if channel_id not in current_user.channels:
         raise HTTPException(
