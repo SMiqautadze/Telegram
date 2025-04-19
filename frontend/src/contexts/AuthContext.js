@@ -39,18 +39,25 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post(`${BACKEND_URL}/login`, {
-        email,
-        password
-      });
-      
-      const { access_token } = response.data;
-      localStorage.setItem('token', access_token);
-      setToken(access_token);
-      return true;
+      setLoading(true);
+      console.log('Login request to:', `${BACKEND_URL}/login`, { email, password });
+      const response = await axios.post(`${BACKEND_URL}/login`, { email, password });
+      console.log('Login response:', response.data);
+      const token = response.data.access_token;
+      localStorage.setItem('token', token);
+      setToken(token);
+      await fetchUserData();
+      setIsAuthenticated(true);
+      return { success: true };
     } catch (error) {
-      console.error('Login error:', error);
-      throw error;
+      console.error('Login failed:', error);
+      console.error('Login error details:', error.response?.data, error.response?.status);
+      return { 
+        success: false, 
+        message: error.response?.data?.detail || 'Login failed. Please check your credentials.'
+      };
+    } finally {
+      setLoading(false);
     }
   };
 
