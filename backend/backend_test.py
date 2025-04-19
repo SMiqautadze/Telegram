@@ -1,96 +1,161 @@
 import pytest
-import httpx
+import requests
 import os
-from dotenv import load_dotenv
+from datetime import datetime
 
-# Load environment variables
-load_dotenv()
+class TestTelegramScraperAPI:
+    BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://your-backend-url.com')
+    TEST_USER = {
+        "email": "test@example.com",
+        "password": "password123",
+        "full_name": "Test User"
+    }
+    TEST_TELEGRAM_CREDS = {
+        "api_id": 20223845,
+        "api_hash": "2d9943c0c4b2b37998a6868f385f3f32",
+        "phone": "+1234567890"
+    }
+    TEST_CHANNEL = {
+        "channel_id": "test_channel",
+        "last_message_id": 0
+    }
 
-# Get the backend URL from environment variable
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'http://localhost:8001')
-
-class TestTelegramScraper:
     def setup_method(self):
-        self.client = httpx.Client(base_url=BACKEND_URL)
-        self.test_user = {
-            "email": "test@example.com",
-            "password": "password123",
-            "full_name": "Test User"
-        }
-        self.telegram_creds = {
-            "api_id": 20223845,
-            "api_hash": "2d9943c0c4b2b37998a6868f385f3f32",
-            "phone": "+1234567890"
-        }
-        self.test_channel = {
-            "channel_id": "test_channel",
-            "last_message_id": 0
-        }
         self.token = None
+        # Clean up any existing test user
+        self.cleanup_test_user()
 
-    def test_01_register(self):
-        response = self.client.post("/api/register", json=self.test_user)
-        assert response.status_code in [200, 201, 400], f"Registration failed: {response.text}"
-        if response.status_code == 400:
-            assert "Email already registered" in response.text
+    def cleanup_test_user(self):
+        """Helper method to clean up test user if exists"""
+        try:
+            # Try to login and delete if exists
+            response = requests.post(
+                f"{self.BASE_URL}/api/login",
+                json={"email": self.TEST_USER["email"], "password": self.TEST_USER["password"]}
+            )
+            if response.status_code == 200:
+                # Would need a delete user endpoint in production
+                pass
+        except:
+            pass
 
-    def test_02_login(self):
-        response = self.client.post("/api/login", json={
-            "email": self.test_user["email"],
-            "password": self.test_user["password"]
-        })
-        assert response.status_code == 200, f"Login failed: {response.text}"
+    def test_01_register_user(self):
+        """Test user registration"""
+        response = requests.post(
+            f"{self.BASE_URL}/api/register",
+            json=self.TEST_USER
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "id" in data
+        assert data["email"] == self.TEST_USER["email"]
+
+    def test_02_login_user(self):
+        """Test user login"""
+        response = requests.post(
+            f"{self.BASE_URL}/api/login",
+            json={
+                "email": self.TEST_USER["email"],
+                "password": self.TEST_USER["password"]
+            }
+        )
+        assert response.status_code == 200
         data = response.json()
         assert "access_token" in data
+        assert data["token_type"] == "bearer"
         self.token = data["access_token"]
 
-    def test_03_set_telegram_credentials(self):
-        assert self.token is not None, "No authentication token available"
+    def test_03_get_user_profile(self):
+        """Test getting user profile"""
+        if not self.token:
+            self.test_02_login_user()
+        
         headers = {"Authorization": f"Bearer {self.token}"}
-        response = self.client.post(
-            "/api/telegram-credentials",
-            json=self.telegram_creds,
+        response = requests.get(
+            f"{self.BASE_URL}/api/me",
             headers=headers
         )
-        assert response.status_code == 200, f"Setting Telegram credentials failed: {response.text}"
-
-    def test_04_get_telegram_credentials(self):
-        assert self.token is not None, "No authentication token available"
-        headers = {"Authorization": f"Bearer {self.token}"}
-        response = self.client.get("/api/telegram-credentials", headers=headers)
-        assert response.status_code == 200, f"Getting Telegram credentials failed: {response.text}"
+        assert response.status_code == 200
         data = response.json()
-        assert data["api_id"] == self.telegram_creds["api_id"]
-        assert data["api_hash"] == self.telegram_creds["api_hash"]
-        assert data["phone"] == self.telegram_creds["phone"]
+        assert data["email"] == self.TEST_USER["email"]
 
-    def test_05_add_channel(self):
-        assert self.token is not None, "No authentication token available"
+    def test_04_set_telegram_credentials(self):
+        """Test setting Telegram credentials"""
+        if not self.token:
+            self.test_02_login_user()
+        
         headers = {"Authorization": f"Bearer {self.token}"}
-        response = self.client.post(
-            "/api/channels",
-            json=self.test_channel,
+        response = requests.post(
+            f"{self.BASE_URL}/api/telegram-credentials",
+            headers=headers,
+            json=self.TEST_TELEGRAM_CREDS
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "message" in data
+        assert "successfully" in data["message"].lower()
+
+    def test_05_get_telegram_credentials(self):
+        """Test getting Telegram credentials"""
+        if not self.token:
+            self.test_02_login_user()
+        
+        headers = {"Authorization": f"Bearer {self.token}"}
+        response = requests.get(
+            f"{self.BASE_URL}/api/telegram-credentials",
             headers=headers
         )
-        assert response.status_code == 200, f"Adding channel failed: {response.text}"
+        assert response.status_code == 200
+        data = response.json()
+        assert data["api_id"] == self.TEST_TELEGRAM_CREDS["api_id"]
+        assert data["api_hash"] == self.TEST_TELEGRAM_CREDS["api_hash"]
+        assert data["phone"] == self.TEST_TELEGRAM_CREDS["phone"]
 
-    def test_06_get_channels(self):
-        assert self.token is not None, "No authentication token available"
+    def test_06_add_channel(self):
+        """Test adding a channel"""
+        if not self.token:
+            self.test_02_login_user()
+        
         headers = {"Authorization": f"Bearer {self.token}"}
-        response = self.client.get("/api/channels", headers=headers)
-        assert response.status_code == 200, f"Getting channels failed: {response.text}"
+        response = requests.post(
+            f"{self.BASE_URL}/api/channels",
+            headers=headers,
+            json=self.TEST_CHANNEL
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "message" in data
+        assert "successfully" in data["message"].lower()
+
+    def test_07_get_channels(self):
+        """Test getting channels list"""
+        if not self.token:
+            self.test_02_login_user()
+        
+        headers = {"Authorization": f"Bearer {self.token}"}
+        response = requests.get(
+            f"{self.BASE_URL}/api/channels",
+            headers=headers
+        )
+        assert response.status_code == 200
         data = response.json()
         assert "channels" in data
-        assert self.test_channel["channel_id"] in data["channels"]
+        assert self.TEST_CHANNEL["channel_id"] in data["channels"]
 
-    def test_07_remove_channel(self):
-        assert self.token is not None, "No authentication token available"
+    def test_08_remove_channel(self):
+        """Test removing a channel"""
+        if not self.token:
+            self.test_02_login_user()
+        
         headers = {"Authorization": f"Bearer {self.token}"}
-        response = self.client.delete(
-            f"/api/channels/{self.test_channel['channel_id']}",
+        response = requests.delete(
+            f"{self.BASE_URL}/api/channels/{self.TEST_CHANNEL['channel_id']}",
             headers=headers
         )
-        assert response.status_code == 200, f"Removing channel failed: {response.text}"
+        assert response.status_code == 200
+        data = response.json()
+        assert "message" in data
+        assert "successfully" in data["message"].lower()
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
