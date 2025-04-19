@@ -721,7 +721,7 @@ async def export_data(
         conn.close()
         return {"message": "JSON export completed", "path": output_file}
 
-@app.post("/continuous-scrape/start")
+@api_router.post("/continuous-scrape/start")
 async def start_continuous_scrape(current_user: User = Depends(get_current_user)):
     if not current_user.telegram_credentials:
         raise HTTPException(
@@ -748,7 +748,7 @@ async def start_continuous_scrape(current_user: User = Depends(get_current_user)
     
     return {"message": "Continuous scraping started"}
 
-@app.post("/continuous-scrape/stop")
+@api_router.post("/continuous-scrape/stop")
 async def stop_continuous_scrape(current_user: User = Depends(get_current_user)):
     # Update the flag in the database
     result = await db.users.update_one(
