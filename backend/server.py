@@ -73,6 +73,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Create API router with /api prefix
+from fastapi import APIRouter
+api_router = APIRouter(prefix="/api")
+
 # Data models
 class UserCreate(BaseModel):
     email: EmailStr
