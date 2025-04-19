@@ -231,7 +231,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.post("/login", response_model=Token)
+@prefix_router.post("/login", response_model=Token)
 async def login(user_data: UserLogin):
     user = await authenticate_user(user_data.email, user_data.password)
     if not user:
