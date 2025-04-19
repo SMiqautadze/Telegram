@@ -747,7 +747,7 @@ async def start_continuous_scrape(current_user: User = Depends(get_current_user)
     
     return {"message": "Continuous scraping started"}
 
-@app.post("/continuous-scrape/stop")
+@prefix_router.post("/continuous-scrape/stop")
 async def stop_continuous_scrape(current_user: User = Depends(get_current_user)):
     # Update the flag in the database
     result = await db.users.update_one(
