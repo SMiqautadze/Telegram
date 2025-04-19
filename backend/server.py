@@ -810,6 +810,9 @@ async def list_channels(current_user: User = Depends(get_current_user)):
 async def shutdown_db_client():
     client.close()
 
+# Include the API router in the app
+app.include_router(api_router)
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("server:app", host="0.0.0.0", port=8001, reload=True)
