@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
       const token = response.data.access_token;
       localStorage.setItem('token', token);
       setToken(token);
-      await fetchUserData();
+      await fetchUser();
       setIsAuthenticated(true);
       return { success: true };
     } catch (error) {
