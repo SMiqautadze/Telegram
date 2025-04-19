@@ -355,7 +355,7 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
         "full_name": current_user.full_name
     }
 
-@prefix_router.post("/telegram-credentials")
+@app.post("/telegram-credentials")
 async def set_telegram_credentials(credentials: TelegramCredentials, current_user: User = Depends(get_current_user)):
     result = await db.users.update_one(
         {"id": current_user.id},
@@ -375,7 +375,7 @@ async def set_telegram_credentials(credentials: TelegramCredentials, current_use
     
     return {"message": "Telegram credentials set successfully"}
 
-@prefix_router.get("/telegram-credentials")
+@app.get("/telegram-credentials")
 async def get_telegram_credentials(current_user: User = Depends(get_current_user)):
     if not current_user.telegram_credentials:
         raise HTTPException(
@@ -385,11 +385,11 @@ async def get_telegram_credentials(current_user: User = Depends(get_current_user
     
     return current_user.telegram_credentials
 
-@prefix_router.get("/channels")
+@app.get("/channels")
 async def get_channels(current_user: User = Depends(get_current_user)):
     return {"channels": current_user.channels}
 
-@prefix_router.post("/channels")
+@app.post("/channels")
 async def add_channel(channel: ChannelModel, current_user: User = Depends(get_current_user)):
     channels = current_user.channels.copy()
     channels[channel.channel_id] = channel.last_message_id
@@ -412,7 +412,7 @@ async def add_channel(channel: ChannelModel, current_user: User = Depends(get_cu
     
     return {"message": f"Channel {channel.channel_id} added successfully"}
 
-@prefix_router.delete("/channels/{channel_id}")
+@app.delete("/channels/{channel_id}")
 async def remove_channel(channel_id: str, current_user: User = Depends(get_current_user)):
     if channel_id not in current_user.channels:
         raise HTTPException(
@@ -436,11 +436,11 @@ async def remove_channel(channel_id: str, current_user: User = Depends(get_curre
     
     return {"message": f"Channel {channel_id} removed successfully"}
 
-@prefix_router.get("/scrape-settings")
+@app.get("/scrape-settings")
 async def get_scrape_settings(current_user: User = Depends(get_current_user)):
     return {"scrape_media": current_user.scrape_media}
 
-@prefix_router.post("/scrape-settings")
+@app.post("/scrape-settings")
 async def update_scrape_settings(settings: ScrapeSettings, current_user: User = Depends(get_current_user)):
     result = await db.users.update_one(
         {"id": current_user.id},
