@@ -436,7 +436,7 @@ async def remove_channel(channel_id: str, current_user: User = Depends(get_curre
     
     return {"message": f"Channel {channel_id} removed successfully"}
 
-@app.get("/scrape-settings")
+@prefix_router.get("/scrape-settings")
 async def get_scrape_settings(current_user: User = Depends(get_current_user)):
     return {"scrape_media": current_user.scrape_media}
 
