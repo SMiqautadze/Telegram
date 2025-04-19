@@ -347,7 +347,7 @@ async def set_new_password(data: NewPassword):
             detail="Invalid or expired token"
         )
 
-@app.get("/me", response_model=UserResponse)
+@prefix_router.get("/me", response_model=UserResponse)
 async def read_users_me(current_user: User = Depends(get_current_user)):
     return {
         "id": current_user.id,
