@@ -35,6 +35,9 @@ const Register = () => {
         const loginResult = await login(email, password);
         if (!loginResult.success) {
           setError('Account created, but could not log in automatically. Please try logging in manually.');
+        } else {
+          // Successfully registered and logged in
+          navigate('/dashboard');
         }
       }
     } catch (err) {
