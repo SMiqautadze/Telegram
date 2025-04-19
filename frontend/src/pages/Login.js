@@ -15,7 +15,10 @@ const Login = () => {
     setLoading(true);
     
     try {
-      await login(email, password);
+      const result = await login(email, password);
+      if (!result.success) {
+        setError(result.message || 'Failed to log in. Please check your credentials.');
+      }
     } catch (err) {
       setError('Failed to log in. Please check your credentials.');
       console.error(err);
