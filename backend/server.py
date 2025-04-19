@@ -60,13 +60,13 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # Email config
 email_config = ConnectionConfig(
-    MAIL_USERNAME=os.environ.get('MAIL_USERNAME'),
-    MAIL_PASSWORD=os.environ.get('MAIL_PASSWORD'),
-    MAIL_FROM=os.environ.get('MAIL_FROM'),
+    MAIL_USERNAME=os.environ.get('MAIL_USERNAME', 'test@example.com'),
+    MAIL_PASSWORD=os.environ.get('MAIL_PASSWORD', 'password123'),
+    MAIL_FROM=os.environ.get('MAIL_FROM', 'test@example.com'),
     MAIL_PORT=int(os.environ.get('MAIL_PORT', 587)),
-    MAIL_SERVER=os.environ.get('MAIL_SERVER'),
-    MAIL_TLS=os.environ.get('MAIL_TLS', 'True').lower() == 'true',
-    MAIL_SSL=os.environ.get('MAIL_SSL', 'False').lower() == 'true',
+    MAIL_SERVER=os.environ.get('MAIL_SERVER', 'smtp.gmail.com'),
+    MAIL_STARTTLS=True,
+    MAIL_SSL_TLS=False
 )
 
 # Initialize FastAPI app
