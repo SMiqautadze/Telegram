@@ -183,7 +183,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     return user
 
 # API Routes
-@app.post("/register", response_model=UserResponse)
+@api_router.post("/register", response_model=UserResponse)
 async def register_user(user_data: UserCreate):
     # Check if user already exists
     existing_user = await db.users.find_one({"email": user_data.email})
@@ -217,7 +217,7 @@ async def register_user(user_data: UserCreate):
         "full_name": user_data.full_name
     }
 
-@app.post("/token", response_model=Token)
+@api_router.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = await authenticate_user(form_data.username, form_data.password)
     if not user:
@@ -232,7 +232,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.post("/login", response_model=Token)
+@api_router.post("/login", response_model=Token)
 async def login(user_data: UserLogin):
     user = await authenticate_user(user_data.email, user_data.password)
     if not user:
