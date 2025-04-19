@@ -546,7 +546,7 @@ async def get_telegram_client(user_id):
     
     return client
 
-@app.post("/scrape/{channel_id}")
+@prefix_router.post("/scrape/{channel_id}")
 async def scrape_channel(channel_id: str, current_user: User = Depends(get_current_user)):
     if not current_user.telegram_credentials:
         raise HTTPException(
