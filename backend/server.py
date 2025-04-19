@@ -413,7 +413,7 @@ async def add_channel(channel: ChannelModel, current_user: User = Depends(get_cu
     
     return {"message": f"Channel {channel.channel_id} added successfully"}
 
-@app.delete("/channels/{channel_id}")
+@api_router.delete("/channels/{channel_id}")
 async def remove_channel(channel_id: str, current_user: User = Depends(get_current_user)):
     if channel_id not in current_user.channels:
         raise HTTPException(
@@ -437,11 +437,11 @@ async def remove_channel(channel_id: str, current_user: User = Depends(get_curre
     
     return {"message": f"Channel {channel_id} removed successfully"}
 
-@app.get("/scrape-settings")
+@api_router.get("/scrape-settings")
 async def get_scrape_settings(current_user: User = Depends(get_current_user)):
     return {"scrape_media": current_user.scrape_media}
 
-@app.post("/scrape-settings")
+@api_router.post("/scrape-settings")
 async def update_scrape_settings(settings: ScrapeSettings, current_user: User = Depends(get_current_user)):
     result = await db.users.update_one(
         {"id": current_user.id},
