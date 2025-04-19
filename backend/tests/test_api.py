@@ -23,7 +23,7 @@ class TestTelegramScraperAPI:
 
     def test_01_register(self):
         """Test user registration"""
-        response = self.client.post("/api/register", json=self.test_user)
+        response = self.client.post("/register", json=self.test_user)
         assert response.status_code in [200, 400], f"Registration failed: {response.text}"
         if response.status_code == 400:
             assert "Email already registered" in response.text
