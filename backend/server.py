@@ -182,7 +182,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     return user
 
 # API Routes
-@prefix_router.post("/register", response_model=UserResponse)
+@app.post("/register", response_model=UserResponse)
 async def register_user(user_data: UserCreate):
     # Check if user already exists
     existing_user = await db.users.find_one({"email": user_data.email})
@@ -216,7 +216,7 @@ async def register_user(user_data: UserCreate):
         "full_name": user_data.full_name
     }
 
-@prefix_router.post("/token", response_model=Token)
+@app.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = await authenticate_user(form_data.username, form_data.password)
     if not user:
@@ -231,7 +231,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-@prefix_router.post("/login", response_model=Token)
+@app.post("/login", response_model=Token)
 async def login(user_data: UserLogin):
     user = await authenticate_user(user_data.email, user_data.password)
     if not user:
@@ -246,7 +246,7 @@ async def login(user_data: UserLogin):
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-@prefix_router.post("/google-login", response_model=Token)
+@app.post("/google-login", response_model=Token)
 async def google_login(data: GoogleLogin):
     try:
         # Verify the Google token
@@ -294,7 +294,7 @@ async def google_login(data: GoogleLogin):
             detail="Invalid Google token"
         )
 
-@prefix_router.post("/reset-password")
+@app.post("/reset-password")
 async def reset_password(data: ResetPassword):
     user = await get_user(data.email)
     if not user:
@@ -310,7 +310,7 @@ async def reset_password(data: ResetPassword):
     # For testing, just return the token
     return {"message": "Password reset requested", "token": reset_token}
 
-@prefix_router.post("/set-new-password")
+@app.post("/set-new-password")
 async def set_new_password(data: NewPassword):
     try:
         # Verify token
@@ -347,7 +347,7 @@ async def set_new_password(data: NewPassword):
             detail="Invalid or expired token"
         )
 
-@prefix_router.get("/me", response_model=UserResponse)
+@app.get("/me", response_model=UserResponse)
 async def read_users_me(current_user: User = Depends(get_current_user)):
     return {
         "id": current_user.id,
