@@ -246,7 +246,7 @@ async def login(user_data: UserLogin):
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.post("/google-login", response_model=Token)
+@prefix_router.post("/google-login", response_model=Token)
 async def google_login(data: GoogleLogin):
     try:
         # Verify the Google token
