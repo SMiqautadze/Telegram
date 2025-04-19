@@ -5,7 +5,7 @@ from datetime import datetime
 
 class TestAuthAPI(unittest.TestCase):
     def setUp(self):
-        self.base_url = "https://backend-7443.cloud.serverless.com/api"  # Using public endpoint
+        self.base_url = "http://localhost:8001/api"  # Using local endpoint
         self.test_user = {
             "email": f"test_{uuid.uuid4()}@test.com",
             "password": "Test@123",
