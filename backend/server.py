@@ -182,7 +182,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     return user
 
 # API Routes
-@app.post("/register", response_model=UserResponse)
+@prefix_router.post("/register", response_model=UserResponse)
 async def register_user(user_data: UserCreate):
     # Check if user already exists
     existing_user = await db.users.find_one({"email": user_data.email})
