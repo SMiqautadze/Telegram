@@ -26,13 +26,18 @@ const Register = () => {
     setLoading(true);
     
     try {
-      await register(email, password, fullName);
-    } catch (err) {
-      if (err.response && err.response.data) {
-        setError(err.response.data.detail || 'Failed to create an account');
+      const result = await register(email, password, fullName);
+      if (!result.success) {
+        setError(result.message || 'Failed to create an account');
       } else {
-        setError('Failed to create an account');
+        // Attempt to login automatically after successful registration
+        const loginResult = await login(email, password);
+        if (!loginResult.success) {
+          setError('Account created, but could not log in automatically. Please try logging in manually.');
+        }
       }
+    } catch (err) {
+      setError('Failed to create an account');
       console.error(err);
     } finally {
       setLoading(false);
