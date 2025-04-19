@@ -5,7 +5,7 @@ from datetime import datetime
 
 class TestAuthAPI(unittest.TestCase):
     def setUp(self):
-        self.base_url = "http://localhost:8001/api"  # Using configured backend URL
+        self.base_url = "http://localhost:8001/api"  # Using configured backend URL from frontend/.env
         self.test_user = {
             "email": f"test_{uuid.uuid4()}@test.com",
             "password": "Test@123",
