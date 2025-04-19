@@ -61,8 +61,12 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 # Email config disabled for testing
 email_config = None
 
-# Initialize FastAPI app
+# Initialize FastAPI app with API prefix
 app = FastAPI(title="Telegram Scraper API")
+
+# Mount all routes under /api prefix
+prefix_router = FastAPI()
+app.mount("/api", prefix_router)
 
 app.add_middleware(
     CORSMiddleware,
