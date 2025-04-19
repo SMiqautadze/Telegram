@@ -356,7 +356,7 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
         "full_name": current_user.full_name
     }
 
-@app.post("/telegram-credentials")
+@api_router.post("/telegram-credentials")
 async def set_telegram_credentials(credentials: TelegramCredentials, current_user: User = Depends(get_current_user)):
     result = await db.users.update_one(
         {"id": current_user.id},
@@ -376,7 +376,7 @@ async def set_telegram_credentials(credentials: TelegramCredentials, current_use
     
     return {"message": "Telegram credentials set successfully"}
 
-@app.get("/telegram-credentials")
+@api_router.get("/telegram-credentials")
 async def get_telegram_credentials(current_user: User = Depends(get_current_user)):
     if not current_user.telegram_credentials:
         raise HTTPException(
@@ -386,11 +386,11 @@ async def get_telegram_credentials(current_user: User = Depends(get_current_user
     
     return current_user.telegram_credentials
 
-@app.get("/channels")
+@api_router.get("/channels")
 async def get_channels(current_user: User = Depends(get_current_user)):
     return {"channels": current_user.channels}
 
-@app.post("/channels")
+@api_router.post("/channels")
 async def add_channel(channel: ChannelModel, current_user: User = Depends(get_current_user)):
     channels = current_user.channels.copy()
     channels[channel.channel_id] = channel.last_message_id
