@@ -546,7 +546,7 @@ async def get_telegram_client(user_id):
     
     return client
 
-@prefix_router.post("/scrape/{channel_id}")
+@app.post("/scrape/{channel_id}")
 async def scrape_channel(channel_id: str, current_user: User = Depends(get_current_user)):
     if not current_user.telegram_credentials:
         raise HTTPException(
@@ -637,7 +637,7 @@ async def scrape_channel_task(user_id, channel_id, offset_id, scrape_media):
     finally:
         await client.disconnect()
 
-@prefix_router.get("/channel-data/{channel_id}")
+@app.get("/channel-data/{channel_id}")
 async def get_channel_data(channel_id: str, current_user: User = Depends(get_current_user)):
     if channel_id not in current_user.channels:
         raise HTTPException(
@@ -662,7 +662,7 @@ async def get_channel_data(channel_id: str, current_user: User = Depends(get_cur
     messages = [dict(row) for row in rows]
     return {"messages": messages}
 
-@prefix_router.get("/export-data/{channel_id}/{format}")
+@app.get("/export-data/{channel_id}/{format}")
 async def export_data(
     channel_id: str, 
     format: str,
@@ -720,7 +720,7 @@ async def export_data(
         conn.close()
         return {"message": "JSON export completed", "path": output_file}
 
-@prefix_router.post("/continuous-scrape/start")
+@app.post("/continuous-scrape/start")
 async def start_continuous_scrape(current_user: User = Depends(get_current_user)):
     if not current_user.telegram_credentials:
         raise HTTPException(
@@ -747,7 +747,7 @@ async def start_continuous_scrape(current_user: User = Depends(get_current_user)
     
     return {"message": "Continuous scraping started"}
 
-@prefix_router.post("/continuous-scrape/stop")
+@app.post("/continuous-scrape/stop")
 async def stop_continuous_scrape(current_user: User = Depends(get_current_user)):
     # Update the flag in the database
     result = await db.users.update_one(
@@ -776,7 +776,7 @@ async def continuous_scraping_task(user_id):
         # Wait before checking again
         await asyncio.sleep(60)
 
-@prefix_router.get("/channels-list")
+@app.get("/channels-list")
 async def list_channels(current_user: User = Depends(get_current_user)):
     client = await get_telegram_client(current_user.id)
     if not client:
@@ -805,7 +805,7 @@ async def list_channels(current_user: User = Depends(get_current_user)):
     finally:
         await client.disconnect()
 
-@prefix_router.on_event("shutdown")
+@app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
 
