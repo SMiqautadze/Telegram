@@ -90,7 +90,7 @@ export const AuthProvider = ({ children }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log('User data response:', response.data);
-      setUser(response.data);
+      setCurrentUser(response.data);
       return response.data;
     } catch (error) {
       console.error('Error fetching user data:', error);
