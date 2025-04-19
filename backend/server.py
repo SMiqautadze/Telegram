@@ -389,7 +389,7 @@ async def get_telegram_credentials(current_user: User = Depends(get_current_user
 async def get_channels(current_user: User = Depends(get_current_user)):
     return {"channels": current_user.channels}
 
-@app.post("/channels")
+@prefix_router.post("/channels")
 async def add_channel(channel: ChannelModel, current_user: User = Depends(get_current_user)):
     channels = current_user.channels.copy()
     channels[channel.channel_id] = channel.last_message_id
