@@ -303,20 +303,8 @@ async def reset_password(data: ResetPassword):
         expires_delta=timedelta(hours=1)
     )
     
-    # Create email
-    reset_url = f"http://localhost:3000/reset-password?token={reset_token}"
-    message = MessageSchema(
-        subject="Password Reset Request",
-        recipients=[user.email],
-        body=f"Click the link to reset your password: {reset_url}",
-        subtype="html"
-    )
-    
-    # Send email
-    fm = FastMail(email_config)
-    await fm.send_message(message)
-    
-    return {"message": "If your email is registered, a password reset link will be sent"}
+    # For testing, just return the token
+    return {"message": "Password reset requested", "token": reset_token}
 
 @app.post("/set-new-password")
 async def set_new_password(data: NewPassword):
