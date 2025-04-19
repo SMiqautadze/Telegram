@@ -30,7 +30,7 @@ class TestTelegramScraperAPI:
 
     def test_02_login(self):
         """Test user login"""
-        response = self.client.post("/api/login", json={
+        response = self.client.post("/login", json={
             "email": self.test_user["email"],
             "password": self.test_user["password"]
         })
