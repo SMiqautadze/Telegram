@@ -58,16 +58,8 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # OAuth2 token bearer
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-# Email config
-email_config = ConnectionConfig(
-    MAIL_USERNAME=os.environ.get('MAIL_USERNAME', 'test@example.com'),
-    MAIL_PASSWORD=os.environ.get('MAIL_PASSWORD', 'password123'),
-    MAIL_FROM=os.environ.get('MAIL_FROM', 'test@example.com'),
-    MAIL_PORT=int(os.environ.get('MAIL_PORT', 587)),
-    MAIL_SERVER=os.environ.get('MAIL_SERVER', 'smtp.gmail.com'),
-    MAIL_STARTTLS=True,
-    MAIL_SSL_TLS=False
-)
+# Email config disabled for testing
+email_config = None
 
 # Initialize FastAPI app
 app = FastAPI(title="Telegram Scraper API")
