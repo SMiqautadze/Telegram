@@ -77,6 +77,32 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Fetch user data (profile)
+  const fetchUserData = async () => {
+    try {
+      if (!token) {
+        console.log('No token available for fetchUserData');
+        return null;
+      }
+      
+      console.log('Fetching user data from:', `${BACKEND_URL}/me`);
+      const response = await axios.get(`${BACKEND_URL}/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      console.log('User data response:', response.data);
+      setUser(response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      console.error('Error details:', error.response?.data, error.response?.status);
+      // If the error is 401 Unauthorized, the token might be invalid or expired
+      if (error.response && error.response.status === 401) {
+        logout();
+      }
+      return null;
+    }
+  };
+
   const register = async (email, password, fullName) => {
     try {
       console.log('Register request to:', `${BACKEND_URL}/register`, { email, password, full_name: fullName });
