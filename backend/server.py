@@ -440,7 +440,7 @@ async def remove_channel(channel_id: str, current_user: User = Depends(get_curre
 async def get_scrape_settings(current_user: User = Depends(get_current_user)):
     return {"scrape_media": current_user.scrape_media}
 
-@app.post("/scrape-settings")
+@prefix_router.post("/scrape-settings")
 async def update_scrape_settings(settings: ScrapeSettings, current_user: User = Depends(get_current_user)):
     result = await db.users.update_one(
         {"id": current_user.id},
